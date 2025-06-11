@@ -1,0 +1,5 @@
+Traceback (most recent call last):
+  File "C:\Users\wende\Downloads\sistema_hospitalar_projeto\app.py", line 149, in triagem
+    return redirect(url_for('pagina_enfermeira'))
+                    ^^^^^^^
+NameError: name 'url_for' is not defined

@@ -1,0 +1,21 @@
+{
+  "compilerOptions": {
+    "target": "ES2015",                 
+    "outDir": "./static/js",             
+    "sourceMap": true,                   
+    "module": "ESNext",              
+    "moduleResolution": "node",   
+    "strict": true,                      
+    "esModuleInterop": true,            
+    "skipLibCheck": true,                
+    "forceConsistentCasingInFileNames": true, 
+    "rootDir": "./static/ts"             
+  },
+  "include": [
+    "./static/ts/**/*.ts"                
+  ],
+  "exclude": [
+    "node_modules",                      
+    "venv"                               
+  ]
+}
