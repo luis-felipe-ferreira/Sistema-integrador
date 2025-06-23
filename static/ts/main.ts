@@ -1,9 +1,13 @@
+import { MinHeap } from './minHeap'; 
+
 type PacienteDaFilaDB = {
     triagem_id: number;
     nome_paciente: string;
     prioridade: number;
     data_hora_triagem: string;
 };
+
+let filaDePacientesHeap: MinHeap; 
 
 function carregarFila() {
   fetch('/medico/fila')
@@ -22,7 +26,15 @@ function carregarFila() {
       filaDiv.innerHTML = '';
 
       if (Array.isArray(fila) && fila.length > 0) {
-        fila.forEach(p => {
+        filaDePacientesHeap = new MinHeap(fila); 
+        
+        const itensOrdenadosParaExibir = [];
+
+        while(!filaDePacientesHeap.isEmpty()){
+            itensOrdenadosParaExibir.push(filaDePacientesHeap.extractMin());
+        }
+
+        itensOrdenadosParaExibir.forEach(p => { 
           const div = document.createElement('div');
           let dataFormatada = p.data_hora_triagem;
           try {

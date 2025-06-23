@@ -1,6 +1,14 @@
+interface TriagemItem {
+    triagem_id: number;
+    nome_paciente: string;
+    prioridade: number; 
+    data_hora_triagem: string; 
+}
+
 export class MinHeap {
-    constructor(initialItems = []) {
-        this.heap = [];
+    private heap: TriagemItem[] = [];
+
+    constructor(initialItems: TriagemItem[] = []) {
         this.heap = initialItems;
         if (this.heap.length > 0) {
             for (let i = Math.floor(this.heap.length / 2) - 1; i >= 0; i--) {
@@ -8,94 +16,114 @@ export class MinHeap {
             }
         }
     }
-    getLeftChildIndex(parentIndex) {
+
+    private getLeftChildIndex(parentIndex: number): number {
         return 2 * parentIndex + 1;
     }
-    getRightChildIndex(parentIndex) {
+
+    private getRightChildIndex(parentIndex: number): number {
         return 2 * parentIndex + 2;
     }
-    getParentIndex(childIndex) {
+
+    private getParentIndex(childIndex: number): number {
         return Math.floor((childIndex - 1) / 2);
     }
-    hasLeftChild(index) {
+
+    private hasLeftChild(index: number): boolean {
         return this.getLeftChildIndex(index) < this.heap.length;
     }
-    hasRightChild(index) {
+
+    private hasRightChild(index: number): boolean {
         return this.getRightChildIndex(index) < this.heap.length;
     }
-    hasParent(index) {
+
+    private hasParent(index: number): boolean {
         return this.getParentIndex(index) >= 0;
     }
-    leftChild(index) {
+
+    private leftChild(index: number): TriagemItem {
         return this.heap[this.getLeftChildIndex(index)];
     }
-    rightChild(index) {
+
+    private rightChild(index: number): TriagemItem {
         return this.heap[this.getRightChildIndex(index)];
     }
-    parent(index) {
+
+    private parent(index: number): TriagemItem {
         return this.heap[this.getParentIndex(index)];
     }
-    swap(indexOne, indexTwo) {
+
+    private swap(indexOne: number, indexTwo: number): void {
         [this.heap[indexOne], this.heap[indexTwo]] = [this.heap[indexTwo], this.heap[indexOne]];
     }
-    compare(itemA, itemB) {
+
+    private compare(itemA: TriagemItem, itemB: TriagemItem): boolean {
         if (itemA.prioridade !== itemB.prioridade) {
-            return itemA.prioridade < itemB.prioridade;
+            return itemA.prioridade < itemB.prioridade; 
         }
         return new Date(itemA.data_hora_triagem).getTime() < new Date(itemB.data_hora_triagem).getTime();
     }
-    add(item) {
+
+    add(item: TriagemItem): void {
         this.heap.push(item);
         this.heapifyUp();
     }
-    extractMin() {
+
+    extractMin(): TriagemItem | undefined {
         if (this.heap.length === 0) {
             return undefined;
         }
         if (this.heap.length === 1) {
             return this.heap.pop();
         }
+
         const item = this.heap[0];
-        this.heap[0] = this.heap.pop();
+        this.heap[0] = this.heap.pop()!;
         this.heapifyDown();
         return item;
     }
-    peek() {
+
+    peek(): TriagemItem | undefined {
         if (this.heap.length === 0) {
             return undefined;
         }
         return this.heap[0];
     }
-    size() {
+
+    size(): number {
         return this.heap.length;
     }
-    isEmpty() {
+
+    isEmpty(): boolean {
         return this.heap.length === 0;
     }
-    heapifyUp() {
+
+    private heapifyUp(): void {
         let index = this.heap.length - 1;
         while (this.hasParent(index) && this.compare(this.heap[index], this.parent(index))) {
             this.swap(index, this.getParentIndex(index));
             index = this.getParentIndex(index);
         }
     }
-    heapifyDown(startIndex = 0) {
+
+    private heapifyDown(startIndex: number = 0): void {
         let index = startIndex;
         while (this.hasLeftChild(index)) {
             let smallerChildIndex = this.getLeftChildIndex(index);
             if (this.hasRightChild(index) && this.compare(this.rightChild(index), this.leftChild(index))) {
                 smallerChildIndex = this.getRightChildIndex(index);
             }
+
             if (this.compare(this.heap[index], this.heap[smallerChildIndex])) {
-                break;
-            }
-            else {
+                break; 
+            } else {
                 this.swap(index, smallerChildIndex);
             }
             index = smallerChildIndex;
         }
     }
-    buildHeap(items) {
+
+    buildHeap(items: TriagemItem[]): void {
         this.heap = items;
         if (this.heap.length > 0) {
             for (let i = Math.floor(this.heap.length / 2) - 1; i >= 0; i--) {
@@ -104,4 +132,3 @@ export class MinHeap {
         }
     }
 }
-//# sourceMappingURL=minHeap.js.map

@@ -12,12 +12,6 @@ sys.stdout = codecs.getwriter("latin1")(sys.stdout.detach())
 app = Flask(__name__)
 app.secret_key = 'chave_secreta_segura'
 
-credenciais = {
-    'recepcionista': '1234',
-    'enfermeira': '1234',
-    'medico': '1234'
-}
-
 
 def login_requerido(perfil):
     def decorator(f):
@@ -41,15 +35,29 @@ def conectar():
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
-    if request.method == 'POST':
-        perfil = request.form['perfil']
-        senha = request.form['senha']
-        if perfil in credenciais and credenciais[perfil] == senha:
-            session['perfil'] = perfil
-            return redirect(url_for(f'pagina_{perfil}')) 
-        else:
-            return "Credenciais inválidas", 403
-    return render_template('login.html')
+    conn = None
+    try:
+        if request.method == 'POST':
+            username = request.form['perfil']
+            senha = request.form['senha']
+
+            conn = conectar()
+            with conn.cursor() as cur:
+                cur.execute("SELECT perfil, password_hash FROM usuarios WHERE username = %s", (username,))
+                usuario = cur.fetchone()
+
+                if usuario and usuario['password_hash'] == senha:
+                    session['perfil'] = usuario['perfil']
+                    return redirect(url_for(f'pagina_{usuario["perfil"]}')) 
+                else:
+                    return "Credenciais inválidas", 403
+        return render_template('login.html')
+    except Exception as e:
+        traceback.print_exc()
+        return "Erro interno no login.", 500
+    finally:
+        if conn and conn.open:
+            conn.close()
 
 @app.route('/logout')
 def logout():
@@ -96,9 +104,8 @@ def cadastrar_paciente():
             return f"Erro: O CPF '{cpf}' já está cadastrado. Por favor, verifique os dados.", 400
         else:
             traceback.print_exc()
-            return "Erro de integridade de dados ao cadastrar.", 500
+            return "Erro de integridade de dados ao cadastrar paciente.", 500
     except Exception as e: 
-        print("--- OCORREU UM ERRO AO CADASTRAR PACIENTE (GERAL) ---")
         traceback.print_exc()
         return "Erro ao cadastrar paciente. Verifique o console do servidor para detalhes.", 500
     finally:
@@ -131,9 +138,9 @@ def triagem():
 
         if request.method == 'POST':
             paciente_id = request.form['paciente_id']
-            pressao = request.form['pressao']
+            pressao_arterial = request.form['pressao']
             temperatura = request.form['temperatura']
-            frequencia = request.form['frequencia']
+            frequencia_cardiaca = request.form['frequencia']
             observacoes = request.form['observacoes']
             prioridade = int(request.form['prioridade'])
             data_hora_triagem = datetime.now(timezone.utc)
@@ -141,20 +148,17 @@ def triagem():
 
             with conn.cursor() as cur:
                 cur.execute("""
-                    INSERT INTO triagem (paciente_id, pressao, temperatura, frequencia, observacoes, prioridade, data_hora_triagem)
-                    VALUES (%s, %s, %s, %s, %s, %s, %s)
-                """, (paciente_id, pressao, temperatura, frequencia, observacoes, prioridade, data_hora_triagem))
+                    INSERT INTO triagem (paciente_id, pressao_arterial, temperatura, frequencia_cardiaca, observacoes, prioridade, data_hora_triagem, status_atendimento)
+                    VALUES (%s, %s, %s, %s, %s, %s, %s, %s)
+                """, (paciente_id, pressao_arterial, temperatura, frequencia_cardiaca, observacoes, prioridade, data_hora_triagem, 'aguardando'))
                 conn.commit()
             return redirect(url_for('pagina_enfermeira'))
             
     except pymysql.MySQLError as e:
-        print(f"Erro de banco de dados na triagem: {e}")
         traceback.print_exc()
         return "Erro ao processar a triagem devido a um problema no banco de dados.", 500
     except Exception as e:
-        print(f"Erro geral na triagem: {e}")
         traceback.print_exc()
-        # Mantenha o log em arquivo se desejar, mas use 'a' para append
         with open("erro_triagem_geral.log", "a", encoding="utf-8") as f:
             f.write(f"{datetime.now()}: {traceback.format_exc()}\n")
         return "Erro ao registrar triagem.", 500
@@ -162,7 +166,6 @@ def triagem():
         if conn and conn.open:
             conn.close()
     
-    # Fallback, idealmente não alcançado
     return "Ocorreu um erro inesperado no fluxo da triagem.", 500
 
 @app.route('/medico/fila')
@@ -183,7 +186,7 @@ def medico_fila():
         return jsonify(fila_db) 
     except Exception as e:
         traceback.print_exc()
-        return jsonify({"error": "Erro ao buscar fila"}), 500
+        return jsonify({"error": "Erro ao buscar fila de pacientes."}), 500
     finally:
         if conn and conn.open:
             conn.close()
@@ -198,7 +201,7 @@ def chamar_paciente():
         with conn.cursor() as cur:
             cur.execute("""
                 SELECT t.id as triagem_id, p.id as paciente_id, p.nome as nome_paciente, 
-                       t.pressao, t.temperatura, t.frequencia, t.observacoes, t.prioridade, t.data_hora_triagem
+                       t.pressao_arterial, t.temperatura, t.frequencia_cardiaca, t.observacoes, t.prioridade, t.data_hora_triagem
                 FROM triagem t
                 JOIN pacientes p ON t.paciente_id = p.id
                 WHERE t.status_atendimento = 'aguardando'
@@ -221,7 +224,7 @@ def chamar_paciente():
 
     except Exception as e:
         traceback.print_exc()
-        return jsonify({"error": "Erro ao chamar paciente"}), 500
+        return jsonify({"error": "Erro ao chamar paciente."}), 500
     finally:
         if conn and conn.open:
             conn.close()

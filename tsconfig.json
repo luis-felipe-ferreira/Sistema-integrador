@@ -9,7 +9,7 @@
     "esModuleInterop": true,            
     "skipLibCheck": true,                
     "forceConsistentCasingInFileNames": true, 
-    "rootDir": "./static/ts"             
+    "rootDir": "./static/ts",
   },
   "include": [
     "./static/ts/**/*.ts"                
