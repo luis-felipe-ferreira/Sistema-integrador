@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registrar Triagem</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Registrar Triagem do Paciente</h1>
+
+        <form id="triagemForm">
+            <div class="paciente-search-container">
+                <label for="paciente_search_input">Buscar Paciente (Nome ou CPF):</label>
+                <input type="text" id="paciente_search_input" placeholder="Digite nome ou CPF do paciente..." autocomplete="off">
+                <div id="searchResults" class="search-results"></div>
+                <div id="selectedPatientInfo" class="selected-patient-info"></div>
+            </div>
+            
+            <input type="hidden" name="pacienteId" id="paciente_id_hidden" required>
+
+            <label for="pressao">Pressão Arterial (ex: 120x80):</label>
+            <input name='pressao' id="pressao" type="text" required>
+
+            <label for="temperatura">Temperatura (°C):</label>
+            <input name='temperatura' id="temperatura" type="text" required>
+
+            <label for="frequencia">Frequência Cardíaca (bpm):</label>
+            <input name='frequencia' id="frequencia" type="text" required>
+
+            <label for="observacoes">Observações Adicionais:</label>
+            <textarea name='observacoes' id="observacoes" rows="4"></textarea>
+
+            <label for="prioridade">Prioridade (1=Alta, 5=Baixa):</label>
+            <input name='prioridade' id="prioridade" type="number" min="1" max="5" required>
+
+            <button type='submit'>Salvar Triagem</button>
+        </form>
+        <p style="margin-top: 20px;"><a href="enfermeira.html">Voltar ao Painel</a></p>
+         <p style="margin-top: 10px;"><a href="#" class="logout-link">Sair</a></p>
+    </div>
+    
+    <script type="module" src="/js/pages/triagem.js" defer></script>
+</body>
+</html>

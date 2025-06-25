@@ -1,0 +1,16 @@
+{
+  "name": "sistema_hospitalar_projeto",
+  "version": "1.0.0",
+  "description": "Interface frontend para o sistema de gerenciamento hospitalar.",
+  "scripts": {
+    "clean": "rimraf dist",
+    "copy-assets": "cpx \"src/**/*.{html,css}\" dist",
+    "build-ts": "tsc",
+    "build": "npm run clean && npm run build-ts && npm run copy-assets"
+  },
+  "devDependencies": {
+    "cpx": "^1.2.1",
+    "rimraf": "^6.0.1",
+    "typescript": "^5.8.3"
+  }
+}

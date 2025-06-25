@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Sistema Hospitalar</title>
+    <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+    <div class="login-container"> <h2>Login no Sistema</h2>
+        <form>
+            <label for="perfil">Perfil:</label>
+            <select name='perfil' id="perfil">
+                <option value='recepcionista'>Recepcionista</option>
+                <option value='enfermeira'>Enfermeira</option>
+                <option value='medico'>Médico</option>
+            </select>
+            <label for="senha">Senha:</label>
+            <input name='senha' id="senha" type='password' required>
+            <button type='submit'>Entrar</button>
+        </form>
+    </div>
+    <script type="module" src="/js/pages/login.js" defer></script>
+</body>
+</html>

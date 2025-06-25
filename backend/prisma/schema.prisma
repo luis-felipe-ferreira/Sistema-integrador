@@ -1,0 +1,39 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Paciente {
+  id              Int      @id @default(autoincrement())
+  cpf             String   @unique
+  nome            String
+  data_nascimento String
+  sexo            String
+  triagens        Triagem[]
+}
+
+model Triagem {
+  id                Int      @id @default(autoincrement())
+  pacienteId        Int
+  paciente          Paciente @relation(fields: [pacienteId], references: [id])
+  pressao           String
+  temperatura       String
+  frequencia        String
+  observacoes       String?
+  prioridade        Int
+  data_hora_triagem DateTime @default(now())
+  FilaAtendimento   FilaAtendimento?
+}
+
+model FilaAtendimento {
+  id                Int      @id @default(autoincrement())
+  triagemId         Int      @unique
+  triagem           Triagem  @relation(fields: [triagemId], references: [id])
+  pacienteNome      String
+  prioridade        Int
+  data_hora_chegada DateTime
+}
