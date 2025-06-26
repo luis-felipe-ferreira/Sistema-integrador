@@ -14,7 +14,10 @@
             <input name='nome' id="nome" type="text" required>
 
             <label for="cpf">CPF:</label>
-            <input name='cpf' id="cpf" type="text" required>
+            <input name='cpf' id="cpf" type="text" required 
+                   maxlength="14" 
+                   pattern="\d{3}\.?\d{3}\.?\d{3}-?\d{2}"
+                   title="Digite um CPF válido no formato 123.456.789-00 ou apenas os 11 números.">
 
             <label for="data_nascimento">Data de Nascimento:</label>
             <input name='data_nascimento' id="data_nascimento" type="date" required>

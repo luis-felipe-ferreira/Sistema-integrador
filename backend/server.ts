@@ -10,31 +10,43 @@ app.use(express.json());
 
 const PORT = 3001;
 
-// Rota de Login
+// --- ROTAS DA API ---
+
 app.post('/login', async (req: Request, res: Response) => {
     res.json({ success: true, message: 'Login bem-sucedido!' });
 });
 
-// Rota para cadastrar um novo paciente
+
 app.post('/pacientes', async (req: Request, res: Response) => {
     const { nome, cpf, data_nascimento, sexo } = req.body;
+
+    if (!cpf) {
+        return res.status(400).json({ error: 'O campo CPF é obrigatório.' });
+    }
+
+    const cpfLimpo = cpf.replace(/[^\d]/g, '');
+
+    if (cpfLimpo.length !== 11) {
+        return res.status(400).json({ error: 'CPF inválido. Deve conter exatamente 11 dígitos.' });
+    }
+
     try {
         const novoPaciente = await prisma.paciente.create({
-            data: { nome, cpf, data_nascimento, sexo },
+            data: { nome, cpf: cpfLimpo, data_nascimento, sexo },
         });
         res.status(201).json(novoPaciente);
     } catch (error) {
-        res.status(400).json({ error: 'Erro ao cadastrar paciente, CPF já pode existir.' });
+        res.status(400).json({ error: 'Erro ao cadastrar paciente. O CPF já pode existir.' });
     }
 });
 
-// Rota para buscar todos os pacientes
+
 app.get('/pacientes', async (req: Request, res: Response) => {
     const pacientes = await prisma.paciente.findMany();
     res.json(pacientes);
 });
 
-// Rota para registrar uma nova triagem
+
 app.post('/triagens', async (req: Request, res: Response) => {
     const { pacienteId, pressao, temperatura, frequencia, observacoes, prioridade } = req.body;
     
@@ -68,7 +80,7 @@ app.post('/triagens', async (req: Request, res: Response) => {
     }
 });
 
-// Rota para buscar a fila de triagem
+
 app.get('/fila', async (req: Request, res: Response) => {
     const fila = await prisma.filaAtendimento.findMany({
         orderBy: [
@@ -80,7 +92,7 @@ app.get('/fila', async (req: Request, res: Response) => {
     res.json(filaAdaptada);
 });
 
-// Rota para atender o próximo paciente da fila
+
 app.post('/atender-proximo', async (req: Request, res: Response) => {
     const proximoDaFila = await prisma.filaAtendimento.findFirst({
         orderBy: [
@@ -105,18 +117,5 @@ app.post('/atender-proximo', async (req: Request, res: Response) => {
 
 
 app.listen(PORT, () => {
-  console.log(`!!! Servidor backend rodando na porta ${PORT}`);
-});
-
-// Dentro de backend/server.ts
-app.post('/pacientes', async (req, res) => {
-    // ...
-    try {
-        // Tenta criar o paciente
-        const novoPaciente = await prisma.paciente.create({ data: { ... } });
-        res.status(201).json(novoPaciente);
-    } catch (error) {
-        // Se o Prisma falhar (ex: por CPF duplicado), ele cai AQUI!
-        res.status(400).json({ error: 'Erro ao cadastrar paciente, CPF já pode existir.' });
-    }
+  console.log(`🚀 Servidor backend rodando na porta ${PORT}`);
 });
