@@ -26,7 +26,6 @@ function carregarFila() {
             const p = filaHeap.extractMin();
             const div = document.createElement('div');
             const dataFormatada = new Date(p.data_hora_triagem).toLocaleString('pt-BR');
-            // Usa p.nome_paciente, que é o campo correto vindo da API /fila
             div.textContent = `${p.nome_paciente} (Prioridade: ${p.prioridade}, Chegada: ${dataFormatada})`;
             filaDiv.appendChild(div);
         }
@@ -39,18 +38,22 @@ function chamarProximo() {
             pacienteDiv.textContent = "Não há pacientes na fila para chamar.";
         }
         else {
-            // Usa a propriedade aninhada 'paciente' que vem da API /atender-proximo
-            pacienteDiv.textContent = `
-      Paciente Chamado:
-      Nome: ${data.paciente.nome}
-      CPF: ${data.paciente.cpf}
-      Prioridade: ${data.prioridade}
-      Pressão: ${data.pressao}
-      Temperatura: ${data.temperatura}
-      Frequência: ${data.frequencia}
-      Observações: ${data.observacoes}
-      Hora da Triagem: ${new Date(data.data_hora_triagem).toLocaleString('pt-BR')}
-    `;
+            if (data.paciente) {
+                pacienteDiv.textContent = `
+        Paciente Chamado:
+        Nome: ${data.paciente.nome}
+        CPF: ${data.paciente.cpf}
+        Prioridade: ${data.prioridade}
+        Pressão: ${data.pressao || 'N/A'}
+        Temperatura: ${data.temperatura || 'N/A'}
+        Frequência: ${data.frequencia || 'N/A'}
+        Observações: ${data.observacoes || 'Nenhuma'}
+        Hora da Triagem: ${new Date(data.data_hora_triagem).toLocaleString('pt-BR')}
+      `;
+            }
+            else {
+                pacienteDiv.textContent = `Erro: Dados do paciente chamado estão incompletos.`;
+            }
         }
         yield carregarFila();
     });

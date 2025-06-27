@@ -10,7 +10,6 @@ app.use(express.json());
 
 const PORT = 3001;
 
-// --- ROTAS DA API ---
 
 app.post('/login', async (req: Request, res: Response) => {
     res.json({ success: true, message: 'Login bem-sucedido!' });
@@ -51,6 +50,18 @@ app.post('/triagens', async (req: Request, res: Response) => {
     const { pacienteId, pressao, temperatura, frequencia, observacoes, prioridade } = req.body;
     
     try {
+        const pacienteJaNaFila = await prisma.filaAtendimento.findFirst({
+            where: {
+                triagem: {
+                    pacienteId: Number(pacienteId)
+                }
+            }
+        });
+
+        if (pacienteJaNaFila) {
+            return res.status(409).json({ error: 'Este paciente já se encontra na fila de atendimento.' });
+        }
+        
         const novaTriagem = await prisma.triagem.create({
             data: {
                 pacienteId: Number(pacienteId),
@@ -117,5 +128,5 @@ app.post('/atender-proximo', async (req: Request, res: Response) => {
 
 
 app.listen(PORT, () => {
-  console.log(`🚀 Servidor backend rodando na porta ${PORT}`);
+  console.log(`!Servidor backend rodando na porta ${PORT}`);
 });

@@ -18,14 +18,19 @@ export const addPaciente = (paciente) => __awaiter(void 0, void 0, void 0, funct
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(paciente),
     });
+    if (!response.ok) {
+        const errorData = yield response.json();
+        throw new Error(errorData.error || 'Um erro desconhecido ocorreu.');
+    }
     return response.json();
 });
 export const getFilaDeTriagem = () => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield fetch(`${API_URL}/fila`);
-    const fila = yield response.json();
-    return fila.map((item) => (Object.assign(Object.assign({}, item), { nome_paciente: item.paciente.nome })));
+    if (!response.ok) {
+        throw new Error('Falha ao buscar a fila.');
+    }
+    return response.json();
 });
-// MUDANÇA AQUI: A função agora usa o novo tipo 'NovaTriagemData' como parâmetro.
 export const addTriagem = (triagemData) => __awaiter(void 0, void 0, void 0, function* () {
     const response = yield fetch(`${API_URL}/triagens`, {
         method: 'POST',

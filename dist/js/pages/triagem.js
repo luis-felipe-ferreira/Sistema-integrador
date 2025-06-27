@@ -9,56 +9,46 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 };
 import { verificarAcesso, logout } from '../services/authService.js';
 import { getPacientes, addTriagem } from '../services/dataService.js';
-// Protege a página, permitindo acesso apenas à enfermeira
 verificarAcesso('enfermeira');
 let todosPacientes = [];
-// Função principal que executa quando a página carrega
 document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
-    // Carrega a lista de pacientes do backend
     try {
         todosPacientes = yield getPacientes();
     }
     catch (error) {
         console.error('Falha ao carregar pacientes:', error);
         alert('Não foi possível carregar a lista de pacientes do servidor.');
-        return; // Interrompe a execução se não conseguir carregar
+        return;
     }
-    // Pega os elementos do HTML
     const searchInput = document.getElementById('paciente_search_input');
     const searchResultsDiv = document.getElementById('searchResults');
     const hiddenPacienteIdInput = document.getElementById('paciente_id_hidden');
     const selectedPatientInfoDiv = document.getElementById('selectedPatientInfo');
     const triagemForm = document.getElementById('triagemForm');
-    // "Ouve" o que o usuário digita no campo de busca
     searchInput.addEventListener('input', () => {
         const termoBusca = searchInput.value.toLowerCase().trim();
-        searchResultsDiv.innerHTML = ''; // Limpa resultados anteriores
+        searchResultsDiv.innerHTML = '';
         searchResultsDiv.style.display = 'none';
         if (termoBusca.length < 2) {
-            return; // Só busca com 2 ou mais caracteres
+            return;
         }
         const pacientesFiltrados = todosPacientes.filter(paciente => paciente.nome.toLowerCase().includes(termoBusca) ||
             paciente.cpf.includes(termoBusca));
         if (pacientesFiltrados.length > 0) {
-            searchResultsDiv.style.display = 'block'; // Mostra a caixa de resultados
+            searchResultsDiv.style.display = 'block';
             pacientesFiltrados.forEach(paciente => {
                 const itemDiv = document.createElement('div');
                 itemDiv.classList.add('result-item');
-                // Cria o HTML para cada item da lista com nome e CPF
                 itemDiv.innerHTML = `
                     <span class="patient-name">${paciente.nome}</span>
                     <span class="patient-cpf">CPF: ${paciente.cpf}</span>
                 `;
-                // Adiciona um evento de clique para cada item
                 itemDiv.addEventListener('click', () => {
-                    // Preenche os campos ao selecionar um paciente
                     searchInput.value = paciente.nome;
                     hiddenPacienteIdInput.value = paciente.id.toString();
-                    // Mostra a confirmação do paciente selecionado
                     selectedPatientInfoDiv.textContent = `Paciente Selecionado: ${paciente.nome}`;
                     selectedPatientInfoDiv.style.display = 'block';
-                    // Esconde a lista de resultados
                     searchResultsDiv.innerHTML = '';
                     searchResultsDiv.style.display = 'none';
                 });
@@ -66,13 +56,11 @@ document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, vo
             });
         }
     });
-    // Esconde a lista se o usuário clicar fora dela
     document.addEventListener('click', (e) => {
         if (!searchResultsDiv.contains(e.target) && e.target !== searchInput) {
             searchResultsDiv.style.display = 'none';
         }
     });
-    // Lógica para enviar o formulário
     triagemForm.addEventListener('submit', (e) => __awaiter(void 0, void 0, void 0, function* () {
         e.preventDefault();
         if (!hiddenPacienteIdInput.value) {
@@ -90,14 +78,13 @@ document.addEventListener('DOMContentLoaded', () => __awaiter(void 0, void 0, vo
         try {
             yield addTriagem(triagemData);
             alert('Triagem salva com sucesso!');
-            window.location.href = './enfermeira.html'; // Volta para o painel
+            window.location.href = './enfermeira.html';
         }
         catch (error) {
             alert('Erro ao salvar a triagem. Tente novamente.');
             console.error('Erro ao salvar triagem:', error);
         }
     }));
-    // Funcionalidade do botão de logout
     (_a = document.querySelector('.logout-link')) === null || _a === void 0 ? void 0 : _a.addEventListener('click', (e) => {
         e.preventDefault();
         logout();

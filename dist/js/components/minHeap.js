@@ -1,4 +1,3 @@
-// A classe MinHeap continua a mesma, usando a interface TriagemItem
 export class MinHeap {
     constructor(initialItems = []) {
         this.heap = [];

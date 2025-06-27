@@ -1,28 +1,5 @@
-// Definimos como é um objeto Paciente para ser usado em outras partes
-export interface Paciente {
-    id: number;
-    nome: string;
-    cpf: string;
-}
+import { TriagemItem } from '../types.js'; 
 
-// A interface TriagemItem agora inclui o objeto Paciente aninhado
-export interface TriagemItem {
-    id: number; // ID da Triagem
-    prioridade: number;
-    data_hora_triagem: string;
-    pressao: string;
-    temperatura: string;
-    frequencia: string;
-    observacoes: string | null;
-    
-    // Propriedade para a lista da fila, vinda da API /fila
-    nome_paciente: string; 
-    
-    // Propriedade para os detalhes do paciente chamado, vinda da API /atender-proximo
-    paciente: Paciente; 
-}
-
-// A classe MinHeap continua a mesma, usando a interface TriagemItem
 export class MinHeap {
     private heap: TriagemItem[] = [];
 
